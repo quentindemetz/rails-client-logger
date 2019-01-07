@@ -1,30 +1,32 @@
-window.jsLoggerBasePath ||= ''
-window.jsLoggerUrl ||= "/logger/rails_client_logger/log"
+if (!window.jsLoggerBasePath) { window.jsLoggerBasePath = ''; }
+if (!window.jsLoggerUrl) { window.jsLoggerUrl = "/logger/rails_client_logger/log"; }
 
-window.jsLogger =
-  invoke: (level, message) ->
-    jQuery.ajax {
-      type: 'post'
-      beforeSend: (xhr) ->
-        xhr.setRequestHeader('X-CSRF-Token', jQuery('meta[name="csrf-token"]').attr('content'))
-      data: {level: level, message: message}
-      complete: (request) ->
-        # Nothing yet
-      url: "" + window.jsLoggerBasePath + window.jsLoggerUrl
-    }
+window.jsLogger = {
+  invoke(level, message) {
+    var req = new XMLHttpRequest();
+    req.open('POST', `${window.jsLoggerBasePath}${window.jsLoggerUrl}`)
+    req.setRequestHeader('X-CSRF-Token', document.querySelector('meta[name="csrf-token"]').content)
+    req.setRequestHeader("Content-Type", "application/json");
+    req.send(JSON.stringify({level, message}))
+  },
 
-  debug: (message) ->
-        @invoke('debug', message)
+  debug(message) {
+    return this.invoke('debug', message);
+  },
 
-  info: (message) ->
-        @invoke('info', message)
+  info(message) {
+    return this.invoke('info', message);
+  },
 
-  warn: (message) ->
-        @invoke('warn', message)
+  warn(message) {
+    return this.invoke('warn', message);
+  },
 
-  error: (message) ->
-        @invoke('error', message)
+  error(message) {
+    return this.invoke('error', message);
+  },
 
-  fatal: (message) ->
-        @invoke('fatal', message)
-
+  fatal(message) {
+    return this.invoke('fatal', message);
+  }
+};
